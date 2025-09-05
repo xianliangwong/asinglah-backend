@@ -1,4 +1,4 @@
-package com.asinglah.app;
+package com.asinglah.backend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
