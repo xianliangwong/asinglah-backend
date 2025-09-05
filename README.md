@@ -1,2 +1,2 @@
-# splitpay
+# asinglah
 An Expense Manager
