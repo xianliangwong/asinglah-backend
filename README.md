@@ -1,0 +1,2 @@
+# splitpay
+An Expense Manager
