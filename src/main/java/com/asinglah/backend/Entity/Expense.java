@@ -42,9 +42,9 @@ public class Expense {
     @JoinColumn(name = "group_id", nullable = false)
     private Expense_group expense_group;
 
-    @OneToOne
-    @JoinColumn(name ="user_id",nullable = false)
-    private User userId;
+    @ManyToOne 
+    @JoinColumn(name ="user_id", nullable = false, referencedColumnName = "user_id")
+    private User user;
 
     // One Expense → Many ExpenseSplits
     @OneToMany(mappedBy = "expenseId", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -63,7 +63,7 @@ public class Expense {
     private String currencyCode;
     // CHAR(3) in SQL Server maps to String with length = 3
 
-     @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
     // TIMESTAMP in SQL Server maps to LocalDateTime in Java
 

@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
@@ -34,7 +35,7 @@ public class Expense_group {
     private String groupName;
 
     @OneToOne
-    @Column(name="groupOwner_id",nullable = false)
+    @JoinColumn(name ="groupOwner_id",nullable = false)
     private User groupOwnerId;
 
      // TIMESTAMP column
