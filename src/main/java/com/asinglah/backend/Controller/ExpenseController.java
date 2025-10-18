@@ -1,6 +1,6 @@
 package com.asinglah.backend.Controller;
 
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,8 +20,9 @@ public class ExpenseController {
         this.expenseService = expenseService;
     }
 
+    //ResponseEntity<Expense>
     @PostMapping("/api/expense/createExpense")
-    public ResponseEntity<Expense> createExpense(@Valid @RequestBody CreateExpenseRequest request) {
+    public Expense createExpense(@Valid @RequestBody CreateExpenseRequest request) {
         Expense expense = expenseService.createExpense(
                 request.getCreatorId(),
                 request.getGroupId(),
@@ -29,7 +30,10 @@ public class ExpenseController {
                 request.getTotalAmount(),
                 request.getSplits()
         );
-        return ResponseEntity.ok(expense);
+
+        //can change to use a response dto for data in global response 
+        return expense; //using global response handler with status code, message and data
+        //return ResponseEntity.ok(expense);
     }
 
 }

@@ -10,7 +10,7 @@ import com.asinglah.backend.Entity.Expense;
 import com.asinglah.backend.Entity.Expense_group;
 import com.asinglah.backend.Entity.Expense_split;
 import com.asinglah.backend.Entity.User;
-import com.asinglah.backend.Repository.ExpenseGroupRepositroy;
+import com.asinglah.backend.Repository.ExpenseGroupRepository;
 import com.asinglah.backend.Repository.ExpenseRepository;
 import com.asinglah.backend.Repository.UserRepository;
 
@@ -22,9 +22,9 @@ public class ExpenseService {
 
     private final ExpenseRepository expenseRepository;
     private final UserRepository userRepository;
-    private final ExpenseGroupRepositroy expenseGroupRepository;
+    private final ExpenseGroupRepository expenseGroupRepository;
 
-public ExpenseService(ExpenseRepository expenseRepository, UserRepository userRepository,ExpenseGroupRepositroy expenseGroupRepositroy) {
+public ExpenseService(ExpenseRepository expenseRepository, UserRepository userRepository,ExpenseGroupRepository expenseGroupRepositroy) {
         this.expenseRepository = expenseRepository;
         this.userRepository = userRepository;
         this.expenseGroupRepository=expenseGroupRepositroy;
