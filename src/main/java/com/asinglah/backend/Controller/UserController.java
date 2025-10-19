@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.asinglah.backend.DTO.CreateSignUpRequest;
 import com.asinglah.backend.DTO.ResponseClass.SignUpUserResponseDTO;
-
+import com.asinglah.backend.HelperClass.APIResponse;
 import com.asinglah.backend.Service.UserService;
 
 import jakarta.validation.Valid;
@@ -25,10 +25,12 @@ public class UserController {
 
     //change parameter 
     @PostMapping("/api/users/signup")
-    public SignUpUserResponseDTO userSignUp(@Valid @RequestBody CreateSignUpRequest request){
+    public APIResponse<SignUpUserResponseDTO> userSignUp(@Valid @RequestBody CreateSignUpRequest request){
         
         SignUpUserResponseDTO userResponse = userService.createUser(request);
-        return userResponse;
+       
+        return APIResponse.success(userResponse);
+      
 
         
     }

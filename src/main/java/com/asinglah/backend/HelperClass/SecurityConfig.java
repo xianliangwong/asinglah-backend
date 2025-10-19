@@ -17,14 +17,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(12); // 12 = strength (work factor)
     }
 
-//     @Bean
-// public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//     http
-//         .csrf(csrf -> csrf.disable())
-//         .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
-//     return http.build();
-// }
-
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -33,13 +25,19 @@ public class SecurityConfig {
     .authorizeHttpRequests(auth -> auth
        .requestMatchers(
     "/swagger-ui.html",
+    "/error",
     "/swagger-ui/**",
+    "/v3/api-docs",    
     "/v3/api-docs/**",
     "/swagger-resources/**",
     "/swagger-resources",
     "/configuration/ui",
     "/configuration/security",
-    "/webjars/**"
+    "/webjars/**",
+    "/api/users/signup",
+    "/api/users/login",
+    "/api/users/signup/**",
+    "/api/users/login/**"
         ).permitAll()
         .anyRequest().authenticated()
     )

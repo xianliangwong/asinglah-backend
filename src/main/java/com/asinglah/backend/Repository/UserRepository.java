@@ -9,7 +9,7 @@ import com.asinglah.backend.Entity.User;
 public interface UserRepository extends JpaRepository<User,Long> {
 
 
-    @Query(value = "SELECT * FROM users u WHERE u.user_email = :email", nativeQuery = true)
+    @Query(value = "SELECT * FROM users u WHERE u.email_address = :email", nativeQuery = true)
     User findByEmailNative(@Param("email") String email);
 
 

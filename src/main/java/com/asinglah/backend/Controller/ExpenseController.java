@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.asinglah.backend.DTO.CreateExpenseRequest;
 import com.asinglah.backend.Entity.Expense;
+import com.asinglah.backend.HelperClass.APIResponse;
 import com.asinglah.backend.Service.ExpenseService;
 
 import jakarta.validation.Valid;
@@ -22,7 +23,7 @@ public class ExpenseController {
 
     //ResponseEntity<Expense>
     @PostMapping("/api/expense/createExpense")
-    public Expense createExpense(@Valid @RequestBody CreateExpenseRequest request) {
+    public APIResponse<Expense> createExpense(@Valid @RequestBody CreateExpenseRequest request) {
         Expense expense = expenseService.createExpense(
                 request.getCreatorId(),
                 request.getGroupId(),
@@ -32,7 +33,7 @@ public class ExpenseController {
         );
 
         //can change to use a response dto for data in global response 
-        return expense; //using global response handler with status code, message and data
+        return APIResponse.success(expense);//using global response handler with status code, message and data
         //return ResponseEntity.ok(expense);
     }
 

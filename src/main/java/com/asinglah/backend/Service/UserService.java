@@ -2,8 +2,11 @@ package com.asinglah.backend.Service;
 
 import java.time.LocalDateTime;
 
+import org.springframework.http.HttpStatus;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.asinglah.backend.DTO.CreateSignUpRequest;
 import com.asinglah.backend.DTO.SignInDTO;
@@ -37,7 +40,11 @@ public class UserService {
         User existingUser = userRepository.findByEmailNative(newUser.getEmailAddress());
 
         if(existingUser!=null){
-           throw new RuntimeException("The email address "+newUser.getEmailAddress()+" has been taken, failed to sign up");
+            throw new ResponseStatusException(
+        HttpStatus.BAD_REQUEST,
+            "The email address " + newUser.getEmailAddress() + " has been taken, failed to sign up"
+            );
+           
         }
         
 
@@ -85,13 +92,21 @@ public class UserService {
         User user = userRepository.findByEmailNative(signInInfo.getEmailAddress());
         
         if(user==null){
-            throw new SecurityException("Invalid credentials");
+              throw new ResponseStatusException(
+        HttpStatus.BAD_REQUEST,
+          "Invalid Credentials"
+            );
         }
 
         if (!passwordEncoder.matches(signInInfo.getPassword(), user.getPassword())) 
         {
-             throw new SecurityException("Invalid credentials");
+                throw new ResponseStatusException(
+        HttpStatus.BAD_REQUEST,
+          "Invalid Credentials"
+            );
         }
+
+        //provide back jwt token 
 
         return user;
         
