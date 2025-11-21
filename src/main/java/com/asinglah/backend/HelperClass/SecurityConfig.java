@@ -36,6 +36,7 @@ public class SecurityConfig {
     "/webjars/**",
     "/api/users/signup",
     "/api/users/login",
+    "/api/expense/createExpenseGroupID",
     "/api/users/signup/**",
     "/api/users/login/**"
         ).permitAll()

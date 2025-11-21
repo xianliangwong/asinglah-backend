@@ -1,4 +1,4 @@
-package com.asinglah.backend.DTO;
+package com.asinglah.backend.DTO.ExpenseRequestDTO;
 
 import java.math.BigDecimal;
 import java.util.List;

@@ -30,6 +30,12 @@ public class APIResponse<T> {
 
     }
 
+    public static<T> APIResponse<T> successCreate(T data)
+    {
+        return new APIResponse<>(201,"Success Created",data);
+
+    }
+
     public static<T> APIResponse<T> failure(String message)
     {
         return new APIResponse<>(400,message,null);
