@@ -2,6 +2,7 @@ package com.asinglah.backend.Controller;
 
 
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -11,10 +12,13 @@ import com.asinglah.backend.DTO.ExpenseRequestDTO.InsertNewSplitDTO;
 import com.asinglah.backend.DTO.ExpesenResponseDTO.CreateExpenseGrpResponse;
 import com.asinglah.backend.Entity.Expense;
 import com.asinglah.backend.Entity.Expense_group;
+import com.asinglah.backend.Entity.Expense_split;
 import com.asinglah.backend.HelperClass.APIResponse;
 import com.asinglah.backend.Service.ExpenseService;
 
 import jakarta.validation.Valid;
+
+import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,7 +36,7 @@ public class ExpenseController {
     }
 
     //ResponseEntity<Expense>
-    @PostMapping("/api/expense/createExpense")
+    @PostMapping("/api/expense/v1/expenses")
     public ResponseEntity<APIResponse<Expense>> createExpense(@Valid @RequestBody CreateExpenseRequest request) {
         APIResponse<Expense> response= expenseService.createExpense(
                 request.getCreatorId(),
@@ -42,38 +46,38 @@ public class ExpenseController {
                 request.getSplits()
         );
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(response.getStatus()).body(response);
 
         //can change to use a response dto for data in global response 
         //return APIResponse.success(expense);//using global response handler with status code, message and data
         //return ResponseEntity.ok(expense);
     }
 
-    @PostMapping("/api/expense/createExpenseGroup")
-    public APIResponse<CreateExpenseGrpResponse> createExpenseGroupID(@Valid @RequestBody CreateExpenseGrp request) {
+    @PostMapping("/api/expense/v1/expenseGroup")
+    public ResponseEntity<APIResponse<CreateExpenseGrpResponse>> createExpenseGroupID(@Valid @RequestBody CreateExpenseGrp request) {
         
         
-        Expense_group expense_group = expenseService.createExpenseGroup(request);
+        APIResponse<CreateExpenseGrpResponse> response = expenseService.createExpenseGroup(request);
 
-        CreateExpenseGrpResponse response = 
-        new CreateExpenseGrpResponse(expense_group.getCreatedAt(),"expense group created", 
-        expense_group.getGroupName(), expense_group.getExpenseGroupId());
-
-        return APIResponse.success(response);
+        return ResponseEntity.status(response.getStatus()).body(response);
 
         
     }
 
-    @GetMapping("/api/expense/getExpenseSplit")
-    public String getExpenseSplit(@RequestParam String param) {
-        return new String();
+    @GetMapping("/api/expense/{expenseId}/splits")
+    public ResponseEntity<APIResponse<List<Expense_split>>> getExpenseSplit(@PathVariable Long expenseId) {
+        
+        APIResponse<List<Expense_split>> response = expenseService.getExistingExpSplit(expenseId);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 
-    @PostMapping("/api/expense/update/adjustSplit")
-    public String updateExistingSplit(@RequestBody String entity) {
+    //change to use update action verb 
+    @PutMapping("/api/expense/{expenseId}/splits")
+    public String updateExistingSplit(@PathVariable Long expenseId,@Valid @RequestBody InsertNewSplitDTO requestNewSplit) {
         //TODO: process POST request
         
-        return entity;
+        return "";
     }
     
 
