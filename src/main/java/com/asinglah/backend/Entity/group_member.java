@@ -51,6 +51,7 @@ public class group_member {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+        this.left_at = LocalDateTime.of(1900, 1, 1, 0, 0);
     }
 
 

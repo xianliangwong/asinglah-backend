@@ -1,5 +1,7 @@
 package com.asinglah.backend.DTO.ExpenseRequestDTO;
 
+import java.util.List;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,6 +16,8 @@ public class CreateExpenseGrp {
 
     @NotNull
     private long groupOwnerId;
+
+    private List<Long> listOfMembers;
 
 
 }

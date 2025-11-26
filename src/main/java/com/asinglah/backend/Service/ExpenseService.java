@@ -17,11 +17,15 @@ import com.asinglah.backend.DTO.ExpesenResponseDTO.CreateExpenseGrpResponse;
 import com.asinglah.backend.Entity.Expense;
 import com.asinglah.backend.Entity.Expense_group;
 import com.asinglah.backend.Entity.Expense_split;
+import com.asinglah.backend.Entity.StatusCode;
 import com.asinglah.backend.Entity.User;
+import com.asinglah.backend.Entity.group_member;
 import com.asinglah.backend.HelperClass.APIResponse;
 import com.asinglah.backend.Repository.ExpenseGroupRepository;
 import com.asinglah.backend.Repository.ExpenseRepository;
 import com.asinglah.backend.Repository.ExpenseSplitRepository;
+import com.asinglah.backend.Repository.GroupMemberRepository;
+import com.asinglah.backend.Repository.StatusCodeRepository;
 import com.asinglah.backend.Repository.UserRepository;
 
 import jakarta.transaction.Transactional;
@@ -34,14 +38,20 @@ public class ExpenseService {
     private final UserRepository userRepository;
     private final ExpenseGroupRepository expenseGroupRepository;
     private final ExpenseSplitRepository expenseSplitRepository;
+    private final GroupMemberRepository groupMemberRepository;
+    private final StatusCodeRepository statusCodeRepository;
+
+    private String newGroupCreationStatus ="SUCCESS";
 
 public ExpenseService(ExpenseRepository expenseRepository, UserRepository userRepository,ExpenseGroupRepository expenseGroupRepositroy,
-ExpenseSplitRepository expenseSplitRepository
+ExpenseSplitRepository expenseSplitRepository,GroupMemberRepository groupMemberRepository,StatusCodeRepository statusCodeRepository
 ) {
         this.expenseRepository = expenseRepository;
         this.userRepository = userRepository;
         this.expenseGroupRepository=expenseGroupRepositroy;
         this.expenseSplitRepository=expenseSplitRepository;
+        this.groupMemberRepository=groupMemberRepository;
+        this.statusCodeRepository=statusCodeRepository;
     }
     @Transactional //this key word faciliates roll back 
     public APIResponse<Expense> createExpense(Long creatorID,Long groupId,String description, BigDecimal totalAmount, List<SplitRequest> splits) {
@@ -102,6 +112,34 @@ ExpenseSplitRepository expenseSplitRepository
 
         try{
         Expense_group saveResponse= expenseGroupRepository.save(expenseGroup);
+
+        //statusID of the member
+        StatusCode statusCode = statusCodeRepository.findByStatusDesc(newGroupCreationStatus);
+
+        try{
+        if(newGroup.getListOfMembers().size()>0)
+        {
+             for(long userId:newGroup.getListOfMembers())
+            {
+                User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+                
+                group_member groupMember = new group_member();
+                groupMember.setUser_id(user);
+                groupMember.setExpense_group(saveResponse);
+                groupMember.setStatusID(statusCode);
+               
+
+            }
+
+        }
+        }
+        catch(Exception e){
+            return APIResponse.failure("Failed to insert new member to expense group: " + e.getMessage());
+        }
+    
+
+      
        
         CreateExpenseGrpResponse response = 
         new CreateExpenseGrpResponse(saveResponse.getCreatedAt(),"expense group created", 
