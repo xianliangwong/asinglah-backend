@@ -82,12 +82,23 @@ public class ExpenseController {
     
 
     @PostMapping("/api/expense/{expenseId}/splits")
-    public APIResponse<String> insertNewSplit(@PathVariable Long expenseId,@Valid @RequestBody InsertNewSplitDTO requestNewSplit) {
+    public ResponseEntity<APIResponse<List<Expense_split>>> insertNewSplit(@PathVariable Long expenseId,@Valid @RequestBody InsertNewSplitDTO requestNewSplit) {
        
         
-        expenseService.adjustExistingExpSplit(expenseId,requestNewSplit);
+        APIResponse<List<Expense_split>> response = expenseService.adjustExistingExpSplit(expenseId,requestNewSplit);
         
-        return APIResponse.successCreate("new split created and adjusted existing expense split");
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @PostMapping("/api/expense/{expenseGroup_id}/groupMember")
+    public ResponseEntity<APIResponse<String>> insertNewMember(@PathVariable Long groupID)
+    {
+
+        APIResponse<String> response = new APIResponse<String>(202, "success created", "");
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+
+
     }
     
     

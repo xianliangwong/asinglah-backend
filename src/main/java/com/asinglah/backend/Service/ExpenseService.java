@@ -2,6 +2,7 @@ package com.asinglah.backend.Service;
 
 import java.io.ObjectInputFilter.Status;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import com.asinglah.backend.DTO.ExpenseRequestDTO.CreateExpenseGrp;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.InsertNewSplitDTO;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.SplitRequest;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.existingSplitDTO;
+import com.asinglah.backend.DTO.ExpesenResponseDTO.CreateExpenseGrpResponse;
 import com.asinglah.backend.Entity.Expense;
 import com.asinglah.backend.Entity.Expense_group;
 import com.asinglah.backend.Entity.Expense_split;
@@ -41,8 +43,8 @@ ExpenseSplitRepository expenseSplitRepository
         this.expenseGroupRepository=expenseGroupRepositroy;
         this.expenseSplitRepository=expenseSplitRepository;
     }
-@Transactional //this key word faciliates roll back 
-public APIResponse<Expense> createExpense(Long creatorID,Long groupId,String description, BigDecimal totalAmount, List<SplitRequest> splits) {
+    @Transactional //this key word faciliates roll back 
+    public APIResponse<Expense> createExpense(Long creatorID,Long groupId,String description, BigDecimal totalAmount, List<SplitRequest> splits) {
         Expense expense = new Expense();
         expense.setDescription(description);
         expense.setTotalAmount(totalAmount);
@@ -72,7 +74,7 @@ public APIResponse<Expense> createExpense(Long creatorID,Long groupId,String des
         try{
             Expense resultExpense= expenseRepository.save(expense); // cascades and saves splits too
 
-            return APIResponse.success(resultExpense);
+            return APIResponse.successCreate(resultExpense);
         }
         catch(Exception e){
              return APIResponse.failure("Failed to create new expense item: " + e.getMessage());
@@ -83,7 +85,7 @@ public APIResponse<Expense> createExpense(Long creatorID,Long groupId,String des
     }
 
     @Transactional
-    public Expense_group createExpenseGroup(CreateExpenseGrp newGroup)
+    public APIResponse<CreateExpenseGrpResponse> createExpenseGroup(CreateExpenseGrp newGroup)
     {
 
         Expense_group expenseGroup = new Expense_group();
@@ -97,13 +99,27 @@ public APIResponse<Expense> createExpense(Long creatorID,Long groupId,String des
         expenseGroup.setGroupOwnerId(groupOwnerID);
         expenseGroup.setGroupName(newGroup.getGroupName());
 
-        return expenseGroupRepository.save(expenseGroup);
+
+        try{
+        Expense_group saveResponse= expenseGroupRepository.save(expenseGroup);
        
+        CreateExpenseGrpResponse response = 
+        new CreateExpenseGrpResponse(saveResponse.getCreatedAt(),"expense group created", 
+        saveResponse.getGroupName(), saveResponse.getExpenseGroupId());
+
+        return APIResponse.successCreate(response);
+
+        }
+        catch(Exception e)
+        {
+             return APIResponse.failure("Failed to create new expense group: " + e.getMessage());
+
+        }
         
     }
 
     @Transactional
-    public boolean adjustExistingExpSplit(long expenseID,InsertNewSplitDTO requestSplit){
+    public APIResponse<List<Expense_split>> adjustExistingExpSplit(long expenseID,InsertNewSplitDTO requestSplit){
 
         List<existingSplitDTO> existingSplitDTO = requestSplit.getExistingExpenseSplit();
         List<SplitRequest> newSplitDTO = requestSplit.getNewExpenseSplit();
@@ -131,6 +147,9 @@ public APIResponse<Expense> createExpense(Long creatorID,Long groupId,String des
             
         }
 
+
+        List<Expense_split> listResponse= new ArrayList<>();
+
         for (SplitRequest splitRequest : newSplitDTO) {
             
             Expense_split newSplit = new Expense_split();
@@ -143,20 +162,22 @@ public APIResponse<Expense> createExpense(Long creatorID,Long groupId,String des
             newSplit.setTotalAmountOwed(splitRequest.getAmount());
             newSplit.setSettled(false);
             
-            expenseSplitRepository.save(newSplit);
+             listResponse.add(expenseSplitRepository.save(newSplit));
             
-            
+           
 
         }
 
-        return true;
+       return APIResponse.successCreate(listResponse);
             
         } catch (Exception e) {
 
-             throw new ResponseStatusException(
-               HttpStatus.INTERNAL_SERVER_ERROR,
-          "failed to create adjusted expense split"
-            );
+
+            return APIResponse.failure("Failed to add new splits: " + e.getMessage());
+        //      throw new ResponseStatusException(
+        //        HttpStatus.INTERNAL_SERVER_ERROR,
+        //   "failed to create adjusted expense split"
+        //     );
             
             
         }
@@ -167,6 +188,29 @@ public APIResponse<Expense> createExpense(Long creatorID,Long groupId,String des
         
     }
 
+    @Transactional
+    public APIResponse<List<Expense_split>> getExistingExpSplit(long expenseID)
+    {
+
+        try{
+        List<Expense_split> expenseSplitList = expenseSplitRepository.findByGroupID(expenseID)
+        .orElseThrow(() -> new ResponseStatusException(
+        HttpStatus.NOT_FOUND, "no result found with this group ID: "+expenseID
+        ));
+
+        return APIResponse.success(expenseSplitList);
+
+
+        }
+        catch(Exception e){
+
+            return APIResponse.failure("Failed to retrieve list of expense split"+e.getMessage());
+
+        }
+
+
+
+    }
     
 
     
