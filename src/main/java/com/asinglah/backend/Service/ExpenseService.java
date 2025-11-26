@@ -114,7 +114,8 @@ ExpenseSplitRepository expenseSplitRepository,GroupMemberRepository groupMemberR
         Expense_group saveResponse= expenseGroupRepository.save(expenseGroup);
 
         //statusID of the member
-        StatusCode statusCode = statusCodeRepository.findByStatusDesc(newGroupCreationStatus);
+        StatusCode statusCode = statusCodeRepository.findByStatusDesc(newGroupCreationStatus)
+        .orElseThrow(() -> new RuntimeException("StatusCode not found"));
 
         try{
         if(newGroup.getListOfMembers().size()>0)
@@ -128,6 +129,8 @@ ExpenseSplitRepository expenseSplitRepository,GroupMemberRepository groupMemberR
                 groupMember.setUser_id(user);
                 groupMember.setExpense_group(saveResponse);
                 groupMember.setStatusID(statusCode);
+
+                groupMemberRepository.save(groupMember);
                
 
             }
@@ -251,6 +254,50 @@ ExpenseSplitRepository expenseSplitRepository,GroupMemberRepository groupMemberR
     }
     
 
+    @Transactional
+    public APIResponse<List<group_member>> insertNewMemberToGroup(Long groupID,List<Long> usersID)
+    {
+
+
+        List<group_member> responseGroupMember = new ArrayList<>();
+
+        try{
+
+            Expense_group expesenGroup = expenseGroupRepository.findById(groupID)
+            .orElseThrow(() -> new RuntimeException("Group not found"));
+
+            for(long userID:usersID){
+
+                group_member newGroupMember = new group_member();
+
+                User memberID = userRepository.findById(userID)
+                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+                StatusCode statusID = statusCodeRepository.findByStatusDesc(newGroupCreationStatus)
+                .orElseThrow(() -> new RuntimeException("StatusID not found"));
+                
+
+                newGroupMember.setExpense_group(expesenGroup);
+                newGroupMember.setUser_id(memberID);
+                newGroupMember.setStatusID(statusID);
+
+                group_member result= groupMemberRepository.save(newGroupMember);
+
+                responseGroupMember.add(result);
+
+
+            }
+
+            return APIResponse.successCreate(responseGroupMember);
+
+        }
+        catch(Exception e){
+
+            return APIResponse.failure("Failed to add new member to group expense: " + e.getMessage());
+        }
+
+      
+    }
     
 }
 

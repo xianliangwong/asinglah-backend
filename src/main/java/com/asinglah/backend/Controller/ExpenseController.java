@@ -13,6 +13,7 @@ import com.asinglah.backend.DTO.ExpesenResponseDTO.CreateExpenseGrpResponse;
 import com.asinglah.backend.Entity.Expense;
 import com.asinglah.backend.Entity.Expense_group;
 import com.asinglah.backend.Entity.Expense_split;
+import com.asinglah.backend.Entity.group_member;
 import com.asinglah.backend.HelperClass.APIResponse;
 import com.asinglah.backend.Service.ExpenseService;
 
@@ -91,10 +92,10 @@ public class ExpenseController {
     }
 
     @PostMapping("/api/expense/{expenseGroup_id}/groupMember")
-    public ResponseEntity<APIResponse<String>> insertNewMember(@PathVariable Long groupID)
+    public ResponseEntity<APIResponse<List<group_member>>> insertNewMember(@PathVariable Long groupID,@Valid @RequestBody List<Long> usersID)
     {
 
-        APIResponse<String> response = new APIResponse<String>(202, "success created", "");
+        APIResponse<List<group_member>> response = expenseService.insertNewMemberToGroup(groupID, usersID);
 
         return ResponseEntity.status(response.getStatus()).body(response);
 

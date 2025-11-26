@@ -1,5 +1,6 @@
 package com.asinglah.backend.DTO.ExpenseRequestDTO;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.validation.constraints.NotNull;
@@ -17,7 +18,7 @@ public class CreateExpenseGrp {
     @NotNull
     private long groupOwnerId;
 
-    private List<Long> listOfMembers;
+    private List<Long> listOfMembers = new ArrayList<>();
 
 
 }

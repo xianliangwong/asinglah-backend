@@ -1,5 +1,7 @@
 package com.asinglah.backend.Repository;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,5 +13,5 @@ public interface StatusCodeRepository extends JpaRepository<StatusCode,Long> {
 
 
     @Query(value = "SELECT * FROM status_code s where s.status_desc=:desc", nativeQuery = true)
-    StatusCode findByStatusDesc(@Param("desc") String desc);
+    Optional<StatusCode> findByStatusDesc(@Param("desc") String desc);
 }

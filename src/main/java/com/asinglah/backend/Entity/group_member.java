@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
@@ -29,7 +30,7 @@ public class group_member {
     @Column(name = "groupMember_id") // DB column name
     private long id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name ="expenseGroup_id",nullable = false)
     private Expense_group expense_group;
 
