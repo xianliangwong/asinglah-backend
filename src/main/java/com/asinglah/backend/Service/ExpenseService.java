@@ -1,7 +1,8 @@
 package com.asinglah.backend.Service;
 
-import java.io.ObjectInputFilter.Status;
+
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,11 +11,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.asinglah.backend.DTO.ExpenseRequestDTO.CreateExpenseGrp;
+import com.asinglah.backend.DTO.ExpenseRequestDTO.CreateExpenseTransactionDTO;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.InsertNewSplitDTO;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.SplitRequest;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.existingSplitDTO;
 import com.asinglah.backend.DTO.ExpesenResponseDTO.CreateExpenseGrpResponse;
 import com.asinglah.backend.Entity.Expense;
+import com.asinglah.backend.Entity.ExpenseTransaction_request;
 import com.asinglah.backend.Entity.Expense_group;
 import com.asinglah.backend.Entity.Expense_split;
 import com.asinglah.backend.Entity.StatusCode;
@@ -24,6 +27,7 @@ import com.asinglah.backend.HelperClass.APIResponse;
 import com.asinglah.backend.Repository.ExpenseGroupRepository;
 import com.asinglah.backend.Repository.ExpenseRepository;
 import com.asinglah.backend.Repository.ExpenseSplitRepository;
+import com.asinglah.backend.Repository.ExpenseTranReqRepository;
 import com.asinglah.backend.Repository.GroupMemberRepository;
 import com.asinglah.backend.Repository.StatusCodeRepository;
 import com.asinglah.backend.Repository.UserRepository;
@@ -40,19 +44,26 @@ public class ExpenseService {
     private final ExpenseSplitRepository expenseSplitRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final StatusCodeRepository statusCodeRepository;
+    private final ExpenseTranReqRepository expenseTranReqRepository;
 
     private String newGroupCreationStatus ="SUCCESS";
+    private String transactionRequestStatus ="PENDING";
+    private String successTransaction ="SUCCESS";
 
 public ExpenseService(ExpenseRepository expenseRepository, UserRepository userRepository,ExpenseGroupRepository expenseGroupRepositroy,
-ExpenseSplitRepository expenseSplitRepository,GroupMemberRepository groupMemberRepository,StatusCodeRepository statusCodeRepository
-) {
+ExpenseSplitRepository expenseSplitRepository,GroupMemberRepository groupMemberRepository,StatusCodeRepository statusCodeRepository,
+ExpenseTranReqRepository expenseTranReqRepository
+) 
+{
         this.expenseRepository = expenseRepository;
         this.userRepository = userRepository;
         this.expenseGroupRepository=expenseGroupRepositroy;
         this.expenseSplitRepository=expenseSplitRepository;
         this.groupMemberRepository=groupMemberRepository;
         this.statusCodeRepository=statusCodeRepository;
+        this.expenseTranReqRepository=expenseTranReqRepository;
     }
+
     @Transactional //this key word faciliates roll back 
     public APIResponse<Expense> createExpense(Long creatorID,Long groupId,String description, BigDecimal totalAmount, List<SplitRequest> splits) {
         Expense expense = new Expense();
@@ -92,6 +103,18 @@ ExpenseSplitRepository expenseSplitRepository,GroupMemberRepository groupMemberR
         }
 
         
+    }
+
+    @Transactional
+    public APIResponse<List<Expense>> getAllExpense(Long groupID)
+    {
+
+        
+        List<Expense> listOfExpense = expenseRepository.getAllExpense(groupID)
+        .orElseThrow(() -> new RuntimeException("list of expense not found"));
+
+        return APIResponse.success(listOfExpense);
+
     }
 
     @Transactional
@@ -299,6 +322,95 @@ ExpenseSplitRepository expenseSplitRepository,GroupMemberRepository groupMemberR
       
     }
     
+    @Transactional
+    public APIResponse<ExpenseTransaction_request> insertExpenseTransaction(Long expenseSplitId,CreateExpenseTransactionDTO req)
+    {
+
+        try{
+
+            ExpenseTransaction_request expenseTranReq = new ExpenseTransaction_request();
+
+            User payee = userRepository.findById(req.getPayeeId()).orElseThrow(() -> new RuntimeException("payee doesn't exists"));
+
+            User payer = userRepository.findById(req.getPayerId()).orElseThrow(() -> new RuntimeException("payee doesn't exists"));
+
+            StatusCode statusId =statusCodeRepository.findByStatusDesc(transactionRequestStatus)
+            .orElseThrow(() -> new RuntimeException("statusID doesn't exists"));
+
+            Expense_split exp = expenseSplitRepository.findById(expenseSplitId).orElseThrow(() -> new RuntimeException("expense id doesn't exists"));
+
+            if(payer != payee){
+
+            expenseTranReq.setPayeeId(payee);
+            expenseTranReq.setPayerId(payer);
+            expenseTranReq.setStatusID(statusId);
+            expenseTranReq.setAmountPaid(req.getTotalAmount());
+            expenseTranReq.setExpenseSplitId(exp);
+
+            expenseTranReqRepository.save(expenseTranReq);
+            
+            return APIResponse.successCreate(expenseTranReq);
+
+            }
+            else
+            {
+                return APIResponse.failure("payee user id error");
+            }
+
+            
+        }
+        catch(Exception e)
+        {
+            return APIResponse.failure("Failed to add expense transaction: " + e.getMessage());
+        }
+
+    }
+
+    @Transactional
+    public APIResponse<ExpenseTransaction_request> updateExpenseTransaction(Long expenseSplitId,Long expenseTransactionId)
+    {
+        
+       
+
+        try{
+        ExpenseTransaction_request trans = expenseTranReqRepository.findById(expenseTransactionId)
+        .orElseThrow(() -> new RuntimeException("expense transaction request not found"));
+
+        StatusCode statusCode = statusCodeRepository.findByStatusDesc(successTransaction)
+        .orElseThrow(() -> new RuntimeException("status id not found"));
+
+        
+
+        trans.setStatusID(statusCode);
+        trans.setUpdatedAt(LocalDateTime.now());
+        
+
+        ExpenseTransaction_request response =expenseTranReqRepository.save(trans);
+
+        //step 2 to update expense split 
+        Expense_split expSplit = expenseSplitRepository.findById(expenseSplitId)
+        .orElseThrow(() -> new RuntimeException("expense split not found"));
+
+        BigDecimal remaingAmountOwed=expSplit.getTotalAmountOwed().subtract(trans.getAmountPaid());
+       
+
+        expSplit.setUpdatedAt(LocalDateTime.now());
+        expSplit.setRemainingAmountOwed(remaingAmountOwed);
+        if(remaingAmountOwed.compareTo(BigDecimal.ZERO)==0){
+            expSplit.setSettled(true);
+
+        }
+
+        expenseSplitRepository.save(expSplit);
+
+
+        return APIResponse.success(response);
+        }
+        catch(Exception e){
+            return APIResponse.failure("Failed to update expense transaction: " + e.getMessage());
+        }
+    }
+
 }
 
 

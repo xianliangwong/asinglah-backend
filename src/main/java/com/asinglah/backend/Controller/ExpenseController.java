@@ -8,10 +8,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.asinglah.backend.DTO.ExpenseRequestDTO.CreateExpenseGrp;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.CreateExpenseRequest;
+import com.asinglah.backend.DTO.ExpenseRequestDTO.CreateExpenseTransactionDTO;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.InsertNewSplitDTO;
 import com.asinglah.backend.DTO.ExpesenResponseDTO.CreateExpenseGrpResponse;
 import com.asinglah.backend.Entity.Expense;
-import com.asinglah.backend.Entity.Expense_group;
+import com.asinglah.backend.Entity.ExpenseTransaction_request;
 import com.asinglah.backend.Entity.Expense_split;
 import com.asinglah.backend.Entity.group_member;
 import com.asinglah.backend.HelperClass.APIResponse;
@@ -21,10 +22,13 @@ import jakarta.validation.Valid;
 
 import java.util.List;
 
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+
+
+
 
 
 @RestController
@@ -53,6 +57,16 @@ public class ExpenseController {
         //return APIResponse.success(expense);//using global response handler with status code, message and data
         //return ResponseEntity.ok(expense);
     }
+
+    @GetMapping("/api/expense/v1/{expenseGroupId}/expenses")
+    public ResponseEntity<APIResponse<List<Expense>>> getAllExpense(@PathVariable Long expenseGroupId) {
+       
+
+        APIResponse<List<Expense>> response = expenseService.getAllExpense(expenseGroupId);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+    
 
     @PostMapping("/api/expense/v1/expenseGroup")
     public ResponseEntity<APIResponse<CreateExpenseGrpResponse>> createExpenseGroupID(@Valid @RequestBody CreateExpenseGrp request) {
@@ -101,6 +115,25 @@ public class ExpenseController {
 
 
     }
+
+    @PostMapping("/api/expense/{expenseSplitId}/expenseTransaction")
+    public ResponseEntity<APIResponse<ExpenseTransaction_request>> insertTransactionRequest(@PathVariable Long expenseSplitId,@RequestBody CreateExpenseTransactionDTO req) {
+        
+        
+        APIResponse<ExpenseTransaction_request> response = expenseService.insertExpenseTransaction(expenseSplitId,req);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @PutMapping("/api/expense/{expenseSplitId}/expenseTransaction/{expenseTransactionId}")
+    public ResponseEntity<APIResponse<ExpenseTransaction_request>> updateTransactionRequest( @PathVariable("expenseSplitId") Long expenseSplitId,
+        @PathVariable("expenseTransactionId") Long expenseTransactionId) {
+        
+       APIResponse<ExpenseTransaction_request> response = expenseService.updateExpenseTransaction(expenseSplitId, expenseTransactionId);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+    
     
     
     

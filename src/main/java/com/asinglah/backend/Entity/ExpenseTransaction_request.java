@@ -32,8 +32,8 @@ public class ExpenseTransaction_request {
     private long transactionId;
 
     @ManyToOne
-    @JoinColumn(name ="expense_id",nullable = false)
-    private Expense expenseId;
+    @JoinColumn(name ="expenseSplit_id",nullable = false)
+    private Expense_split expenseSplitId;
 
     @ManyToOne
     @JoinColumn(name="payer_id",nullable  =false)
@@ -49,9 +49,13 @@ public class ExpenseTransaction_request {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.of(1900, 1, 1, 0, 0);
     }
 
     @ManyToOne
