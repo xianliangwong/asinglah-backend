@@ -50,6 +50,9 @@ public class Expense {
     @OneToMany(mappedBy = "expenseId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Expense_split> splits = new ArrayList<>();
 
+    //One Expense → Many ExpenseTransaction_request
+    @OneToMany(mappedBy="expenseId",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ExpenseTransaction_request> expenseTransactionReq = new ArrayList<>();
 
     @Column(name="description",length = 600)
     private String description;
