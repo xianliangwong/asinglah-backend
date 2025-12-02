@@ -111,7 +111,10 @@ ExpenseTranReqRepository expenseTranReqRepository
 
         
         List<Expense> listOfExpense = expenseRepository.getAllExpense(groupID)
-        .orElseThrow(() -> new RuntimeException("list of expense not found"));
+        .filter(list -> !list.isEmpty())
+        .orElseThrow(() -> new ResponseStatusException(
+        HttpStatus.NOT_FOUND, "no result found with this expense ID: "+groupID
+        ));
 
         return APIResponse.success(listOfExpense);
 
@@ -256,8 +259,9 @@ ExpenseTranReqRepository expenseTranReqRepository
     public APIResponse<List<Expense_split>> getExistingExpSplit(long expenseID)
     {
 
-        try{
+        
         List<Expense_split> expenseSplitList = expenseSplitRepository.findByGroupID(expenseID)
+        .filter(list -> !list.isEmpty())
         .orElseThrow(() -> new ResponseStatusException(
         HttpStatus.NOT_FOUND, "no result found with this group ID: "+expenseID
         ));
@@ -265,12 +269,7 @@ ExpenseTranReqRepository expenseTranReqRepository
         return APIResponse.success(expenseSplitList);
 
 
-        }
-        catch(Exception e){
-
-            return APIResponse.failure("Failed to retrieve list of expense split"+e.getMessage());
-
-        }
+        
 
 
 

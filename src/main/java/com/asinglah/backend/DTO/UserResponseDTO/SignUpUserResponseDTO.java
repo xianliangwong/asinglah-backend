@@ -1,4 +1,4 @@
-package com.asinglah.backend.DTO.ResponseClass;
+package com.asinglah.backend.DTO.UserResponseDTO;
 
 import java.time.LocalDateTime;
 

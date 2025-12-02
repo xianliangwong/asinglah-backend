@@ -18,6 +18,7 @@ import com.asinglah.backend.Entity.group_member;
 import com.asinglah.backend.HelperClass.APIResponse;
 import com.asinglah.backend.Service.ExpenseService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 
 @RestController
+@SecurityRequirement(name = "bearerAuth")
 public class ExpenseController {
     
     private final ExpenseService expenseService;

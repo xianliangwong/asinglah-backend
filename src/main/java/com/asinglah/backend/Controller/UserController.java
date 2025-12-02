@@ -1,14 +1,21 @@
 package com.asinglah.backend.Controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.asinglah.backend.DTO.CreateSignUpRequest;
-import com.asinglah.backend.DTO.ResponseClass.SignUpUserResponseDTO;
+import com.asinglah.backend.DTO.UserRequestDTO.ResetPasswordDTO;
+import com.asinglah.backend.DTO.UserRequestDTO.SignInRequestDTO;
+import com.asinglah.backend.DTO.UserResponseDTO.LogInResponseDTO;
+import com.asinglah.backend.DTO.UserResponseDTO.ResetPasswordResponseDTO;
+import com.asinglah.backend.DTO.UserResponseDTO.SignUpUserResponseDTO;
 import com.asinglah.backend.HelperClass.APIResponse;
 import com.asinglah.backend.Service.UserService;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 @RestController
@@ -25,22 +32,46 @@ public class UserController {
 
     //change parameter 
     @PostMapping("/api/users/signup")
-    public APIResponse<SignUpUserResponseDTO> userSignUp(@Valid @RequestBody CreateSignUpRequest request){
+    public ResponseEntity<APIResponse<SignUpUserResponseDTO>> userSignUp(@Valid @RequestBody CreateSignUpRequest request){
         
-        SignUpUserResponseDTO userResponse = userService.createUser(request);
+        APIResponse<SignUpUserResponseDTO> userResponse = userService.createUser(request);
        
-        return APIResponse.success(userResponse);
-      
+        return ResponseEntity.status(userResponse.getStatus()).body(userResponse);
+     
 
         
     }
 
     @PostMapping("/api/users/login")
-    public String userSignIn(@RequestBody String entity) {
+    public ResponseEntity<APIResponse<LogInResponseDTO>> userSignIn(@Valid @RequestBody SignInRequestDTO request, HttpServletResponse httpResponse) {
         
-        
-        return entity;
+        APIResponse<LogInResponseDTO>  responseDTO= userService.signInVerification(request);
+
+        if(responseDTO.getStatus()==200)
+        {
+            String refreshToken = userService.genRefreshToken(request);
+
+            Cookie cookie = new Cookie("refreshToken", refreshToken);
+            cookie.setHttpOnly(true);
+            cookie.setSecure(true); // use HTTPS
+            cookie.setAttribute("SameSite", "Strict");
+            cookie.setPath("/");    // available for all endpoints
+            cookie.setMaxAge(1 * 24 * 60 * 60); // 7 days
+            httpResponse.addCookie(cookie);
+
+        }
+
+        return ResponseEntity.status(responseDTO.getStatus()).body(responseDTO);
     }
+
+    @PostMapping("/api/users/resetPassword")
+    public ResponseEntity<APIResponse<ResetPasswordResponseDTO>> postMethodName(@Valid @RequestBody ResetPasswordDTO requestDTO) {
+       
+        APIResponse<ResetPasswordResponseDTO> responseDTO = userService.resetPassword(requestDTO);
+
+        return ResponseEntity.status(responseDTO.getStatus()).body(responseDTO);
+    }
+    
     
 
 }

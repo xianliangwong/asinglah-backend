@@ -9,10 +9,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.asinglah.backend.DTO.CreateSignUpRequest;
-import com.asinglah.backend.DTO.SignInDTO;
-import com.asinglah.backend.DTO.ResponseClass.SignUpUserResponseDTO;
+import com.asinglah.backend.DTO.UserRequestDTO.ResetPasswordDTO;
+import com.asinglah.backend.DTO.UserRequestDTO.SignInRequestDTO;
+import com.asinglah.backend.DTO.UserResponseDTO.LogInResponseDTO;
+import com.asinglah.backend.DTO.UserResponseDTO.ResetPasswordResponseDTO;
+import com.asinglah.backend.DTO.UserResponseDTO.SignUpUserResponseDTO;
 import com.asinglah.backend.Entity.User;
-
+import com.asinglah.backend.HelperClass.APIResponse;
+import com.asinglah.backend.HelperClass.JwtUtil;
 import com.asinglah.backend.Repository.UserRepository;
 
 import jakarta.transaction.Transactional;
@@ -24,15 +28,18 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository,PasswordEncoder passwordEncoder){
+    private final JwtUtil jwtUtil;
+
+    public UserService(UserRepository userRepository,PasswordEncoder passwordEncoder,JwtUtil jwtUtil){
 
         this.userRepository=userRepository;
         this.passwordEncoder=passwordEncoder;
+        this.jwtUtil=jwtUtil;
 
     }
 
     @Transactional
-    public SignUpUserResponseDTO createUser(CreateSignUpRequest newUser){
+    public APIResponse<SignUpUserResponseDTO> createUser(CreateSignUpRequest newUser){
 
         
 
@@ -68,16 +75,18 @@ public class UserService {
                         "User created successfully!"
                 );
 
-                return userResponse;
+                return APIResponse.successCreate(userResponse);
         }
         else{
-            SignUpUserResponseDTO userResponse =  new SignUpUserResponseDTO(
-                        LocalDateTime.now(),
-                        "Failed to create"
-                );
+
+            return APIResponse.failure("Failed to create user" );
+            // SignUpUserResponseDTO userResponse =  new SignUpUserResponseDTO(
+            //             LocalDateTime.now(),
+            //             "Failed to create"
+            //     );
        
 
-        return  userResponse;
+      
         }
     }
 
@@ -85,11 +94,11 @@ public class UserService {
     
 
     @Transactional
-    public User signInVerification(SignInDTO signInInfo){
+    public APIResponse<LogInResponseDTO> signInVerification(SignInRequestDTO signInInfo){
 
         
 
-        User user = userRepository.findByEmailNative(signInInfo.getEmailAddress());
+        User user = userRepository.findByEmailNative(signInInfo.emailAddress());
         
         if(user==null){
               throw new ResponseStatusException(
@@ -98,18 +107,61 @@ public class UserService {
             );
         }
 
-        if (!passwordEncoder.matches(signInInfo.getPassword(), user.getPassword())) 
+        if (!passwordEncoder.matches(signInInfo.password(), user.getPassword())) 
         {
                 throw new ResponseStatusException(
         HttpStatus.BAD_REQUEST,
           "Invalid Credentials"
             );
         }
+        else{
+            String accessToken = jwtUtil.generateAccessToken(user.getEmailAddress());
+            LogInResponseDTO response = new LogInResponseDTO(user.getEmailAddress(), accessToken, LocalDateTime.now());
+
+            return APIResponse.success(response);
+
+        }
 
         //provide back jwt token 
 
-        return user;
+        
         
     }
 
+    
+    public String genRefreshToken(SignInRequestDTO signInInfo){
+
+        return jwtUtil.generateRefreshToken(signInInfo.emailAddress());
+    }
+
+
+    @Transactional
+    public APIResponse<ResetPasswordResponseDTO> resetPassword(ResetPasswordDTO request){
+
+        try{
+        User existingUser = userRepository.findByEmailNative(request.emailAddress());
+
+        if(existingUser!=null){
+            String hashedPassword = passwordEncoder.encode(request.newPassword());
+
+            existingUser.setPassword(hashedPassword);
+
+            userRepository.save(existingUser);
+
+            ResetPasswordResponseDTO responseDTO = new ResetPasswordResponseDTO(existingUser.getEmailAddress(), LocalDateTime.now());
+
+            return APIResponse.success(responseDTO);
+        }
+        else{
+
+            return APIResponse.failure("Failed to reset password" );
+
+        }
+        }
+        catch(Exception e){
+            return APIResponse.failure("Failed to reset password"+ e.getMessage());
+        }
+        
+       
+    }
 }
