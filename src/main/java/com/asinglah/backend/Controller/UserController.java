@@ -15,6 +15,7 @@ import com.asinglah.backend.HelperClass.APIResponse;
 import com.asinglah.backend.Service.UserService;
 
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
@@ -65,12 +66,21 @@ public class UserController {
     }
 
     @PostMapping("/api/users/resetPassword")
-    public ResponseEntity<APIResponse<ResetPasswordResponseDTO>> postMethodName(@Valid @RequestBody ResetPasswordDTO requestDTO) {
+    public ResponseEntity<APIResponse<ResetPasswordResponseDTO>> userResetPassword(@Valid @RequestBody ResetPasswordDTO requestDTO) {
        
         APIResponse<ResetPasswordResponseDTO> responseDTO = userService.resetPassword(requestDTO);
 
         return ResponseEntity.status(responseDTO.getStatus()).body(responseDTO);
     }
+
+    @PostMapping("/api/users/refreshAccessToken")
+    public ResponseEntity<APIResponse<LogInResponseDTO>> userRefreshAccessToken(HttpServletRequest request) {
+        
+        APIResponse<LogInResponseDTO> responseDTO =userService.refreshToken(request);
+        
+        return ResponseEntity.status(responseDTO.getStatus()).body(responseDTO);
+    }
+    
     
     
 

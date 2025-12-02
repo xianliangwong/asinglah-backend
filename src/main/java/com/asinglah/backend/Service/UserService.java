@@ -3,7 +3,7 @@ package com.asinglah.backend.Service;
 import java.time.LocalDateTime;
 
 import org.springframework.http.HttpStatus;
-
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,6 +19,8 @@ import com.asinglah.backend.HelperClass.APIResponse;
 import com.asinglah.backend.HelperClass.JwtUtil;
 import com.asinglah.backend.Repository.UserRepository;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -162,6 +164,40 @@ public class UserService {
             return APIResponse.failure("Failed to reset password"+ e.getMessage());
         }
         
+       
+    }
+
+    @Transactional
+    public APIResponse<LogInResponseDTO> refreshToken(HttpServletRequest req)
+    {
+        // Get all cookies from the request
+    Cookie[] cookies = req.getCookies();
+    if (cookies != null) {
+        for (Cookie cookie : cookies) {
+            if ("refreshToken".equals(cookie.getName())) {
+                String refreshToken = cookie.getValue();
+
+                // Validate and issue new access token
+                if (jwtUtil.isTokenValid(refreshToken)) {
+                    String emailAddress = jwtUtil.extractUsername(refreshToken);
+                    String newAccessToken = jwtUtil.generateAccessToken(emailAddress);
+
+                    LogInResponseDTO responseDTO = new LogInResponseDTO(emailAddress, newAccessToken, LocalDateTime.now());
+
+                    return APIResponse.success(responseDTO);
+
+                   
+                } else {
+
+                    return APIResponse.failure("failed to refresh token");
+                    
+                }
+            }
+        }
+    }
+
+    return APIResponse.failure("failed to refresh token");
+
        
     }
 }
