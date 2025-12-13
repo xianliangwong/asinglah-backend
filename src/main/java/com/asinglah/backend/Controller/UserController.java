@@ -57,7 +57,8 @@ public class UserController {
             cookie.setSecure(true); // use HTTPS
             cookie.setAttribute("SameSite", "Strict");
             cookie.setPath("/");    // available for all endpoints
-            cookie.setMaxAge(1 * 24 * 60 * 60); // 7 days
+            cookie.setMaxAge(1 * 24 * 60 * 60); // 1 days, or don set the maxage so that it becomes session cookies
+            //else in log out endpoint, will need to clear the cookie
             httpResponse.addCookie(cookie);
 
         }
