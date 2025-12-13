@@ -35,6 +35,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
        http
+    .cors(withDefaults()) 
     .csrf(csrf -> csrf.disable())
     .authorizeHttpRequests(auth -> auth
        .requestMatchers(
@@ -70,7 +71,7 @@ public class SecurityConfig {
          
         config.setAllowCredentials(true); 
         //add the allow origin
-        config.addAllowedOrigin("http://localhost:4200"); 
+        config.addAllowedOriginPattern("http://localhost:4200"); 
         config.addAllowedHeader("*"); 
         config.addAllowedMethod("*"); 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
