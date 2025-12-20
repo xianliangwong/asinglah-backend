@@ -66,6 +66,33 @@ public class UserController {
         return ResponseEntity.status(responseDTO.getStatus()).body(responseDTO);
     }
 
+    @PostMapping("/api/users/logout")
+    public ResponseEntity<APIResponse<String>> userSignOut(HttpServletResponse httpResponse) {
+        
+        APIResponse<String> responseDTO;
+       
+        try{
+        Cookie cookie = new Cookie("refreshToken", null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true); // still enforce HTTPS
+        cookie.setAttribute("SameSite", "Strict");
+        cookie.setPath("/");    // must match the original path
+        cookie.setMaxAge(0);    // delete immediately
+
+        httpResponse.addCookie(cookie);
+
+        responseDTO = APIResponse.success("log out success");
+        }
+        catch(Exception e){
+
+            responseDTO = APIResponse.failure("log out fail: "+e.getMessage());
+        }
+
+       
+
+        return ResponseEntity.status(responseDTO.getStatus()).body(responseDTO);
+    }
+
     @PostMapping("/api/users/resetPassword")
     public ResponseEntity<APIResponse<ResetPasswordResponseDTO>> userResetPassword(@Valid @RequestBody ResetPasswordDTO requestDTO) {
        
