@@ -53,7 +53,7 @@ public class SecurityConfig {
     "/api/users/login",
     "/api/expense/createExpenseGroupID",
     "/api/users/signup/**",
-    "/api/users/**",
+    //"/api/users/**",
     "/api/users/login/**"
         ).permitAll()
         .anyRequest().authenticated()

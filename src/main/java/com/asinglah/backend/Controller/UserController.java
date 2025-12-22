@@ -11,6 +11,7 @@ import com.asinglah.backend.DTO.UserRequestDTO.SignInRequestDTO;
 import com.asinglah.backend.DTO.UserResponseDTO.LogInResponseDTO;
 import com.asinglah.backend.DTO.UserResponseDTO.ResetPasswordResponseDTO;
 import com.asinglah.backend.DTO.UserResponseDTO.SignUpUserResponseDTO;
+import com.asinglah.backend.DTO.UserResponseDTO.UserIdResponseDTO;
 import com.asinglah.backend.HelperClass.APIResponse;
 import com.asinglah.backend.Service.UserService;
 
@@ -18,6 +19,9 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 public class UserController {
@@ -108,6 +112,14 @@ public class UserController {
         
         return ResponseEntity.status(responseDTO.getStatus()).body(responseDTO);
     }
+
+    @GetMapping("/api/users/userid")
+    public ResponseEntity<APIResponse<UserIdResponseDTO>> getUserId(@RequestParam String email) {
+        APIResponse<UserIdResponseDTO> responseDTO =userService.fetchUserId(email) ;
+
+        return ResponseEntity.status(responseDTO.getStatus()).body(responseDTO);
+    }
+    
     
     
     

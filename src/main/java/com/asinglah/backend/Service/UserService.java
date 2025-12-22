@@ -13,6 +13,7 @@ import com.asinglah.backend.DTO.UserRequestDTO.SignInRequestDTO;
 import com.asinglah.backend.DTO.UserResponseDTO.LogInResponseDTO;
 import com.asinglah.backend.DTO.UserResponseDTO.ResetPasswordResponseDTO;
 import com.asinglah.backend.DTO.UserResponseDTO.SignUpUserResponseDTO;
+import com.asinglah.backend.DTO.UserResponseDTO.UserIdResponseDTO;
 import com.asinglah.backend.Entity.User;
 import com.asinglah.backend.HelperClass.APIResponse;
 import com.asinglah.backend.HelperClass.JwtUtil;
@@ -198,6 +199,32 @@ public class UserService {
     return APIResponse.failure("failed to refresh token");
 
        
+    }
+
+    @Transactional
+    public APIResponse<UserIdResponseDTO> fetchUserId(String email)
+    {
+        try{
+
+
+        User existingUser = userRepository.findByEmailNative(email);
+
+        if(existingUser==null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"invalid email address");
+        }
+        
+
+        UserIdResponseDTO responseDTO = new UserIdResponseDTO(existingUser.getId());
+
+       
+
+        return APIResponse.success(responseDTO);
+        }
+        catch(Exception e){
+            return APIResponse.failure(
+                "failed to get user id");
+        }
+
     }
 
    
