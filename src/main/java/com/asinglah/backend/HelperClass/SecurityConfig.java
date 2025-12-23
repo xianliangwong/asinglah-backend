@@ -58,8 +58,8 @@ public class SecurityConfig {
         ).permitAll()
         .anyRequest().authenticated()
     ).addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-    .httpBasic(withDefaults())
-    ; // instead of formLogin
+    .formLogin(form -> form.disable());
+     // instead of formLogin
 
         return http.build();
     }

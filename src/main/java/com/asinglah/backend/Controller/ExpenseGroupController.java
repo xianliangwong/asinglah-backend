@@ -45,9 +45,9 @@ public class ExpenseGroupController {
         return new String();
     }
 
-    @GetMapping("/api/expenseGroup/{userId}")
+    @GetMapping("/api/expenseGroup/user")
     public ResponseEntity<APIResponse<List<ListExpenseGroupDTO>>> getExpenseGroupsByUserId(@RequestParam long userId) {
-        
+
         APIResponse<List<ListExpenseGroupDTO>> response=expenseService.getExpenseGroupByUserId(userId);
 
          return ResponseEntity.status(response.getStatus()).body(response);
