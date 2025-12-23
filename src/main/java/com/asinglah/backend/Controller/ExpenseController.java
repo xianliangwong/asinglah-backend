@@ -70,16 +70,9 @@ public class ExpenseController {
     }
     
 
-    @PostMapping("/api/expense/v1/expenseGroup")
-    public ResponseEntity<APIResponse<CreateExpenseGrpResponse>> createExpenseGroupID(@Valid @RequestBody CreateExpenseGrp request) {
-        
-        
-        APIResponse<CreateExpenseGrpResponse> response = expenseService.createExpenseGroup(request);
-
-        return ResponseEntity.status(response.getStatus()).body(response);
-
-        
-    }
+    
+    //to do 
+    //check on how to get expensegroup by expensegroupid, another endpoint by userid and statusid=2
 
     @GetMapping("/api/expense/{expenseId}/splits")
     public ResponseEntity<APIResponse<List<Expense_split>>> getExpenseSplit(@PathVariable Long expenseId) {

@@ -16,6 +16,7 @@ import com.asinglah.backend.DTO.ExpenseRequestDTO.InsertNewSplitDTO;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.SplitRequest;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.existingSplitDTO;
 import com.asinglah.backend.DTO.ExpesenResponseDTO.CreateExpenseGrpResponse;
+import com.asinglah.backend.DTO.ExpesenResponseDTO.ListExpenseGroupDTO;
 import com.asinglah.backend.Entity.Expense;
 import com.asinglah.backend.Entity.ExpenseTransaction_request;
 import com.asinglah.backend.Entity.Expense_group;
@@ -410,6 +411,30 @@ ExpenseTranReqRepository expenseTranReqRepository
         }
     }
 
+
+    @Transactional
+    public APIResponse<List<ListExpenseGroupDTO>> getExpenseGroupByUserId(Long userId)
+    {
+
+        try{
+
+            List<ListExpenseGroupDTO> responseDTO = groupMemberRepository.findMemberGroupDTOs(userId);
+
+            if(responseDTO==null){
+               throw new ResponseStatusException(HttpStatus.NOT_FOUND,"invalid userId");
+            }
+           
+
+            return APIResponse.success(responseDTO);
+        }
+        catch(Exception e){
+            return APIResponse.failure("failed to get expense groups");
+           
+        }
+
+
+
+    }
 }
 
 
