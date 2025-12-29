@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
@@ -38,7 +39,7 @@ public class Expense_group {
     @Column(name="group_name", length =255, nullable = false)
     private String groupName;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name ="groupOwner_id",nullable = false)
     private User groupOwnerId;
 
