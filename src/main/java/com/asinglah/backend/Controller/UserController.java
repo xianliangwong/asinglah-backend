@@ -1,5 +1,7 @@
 package com.asinglah.backend.Controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,6 +14,7 @@ import com.asinglah.backend.DTO.UserResponseDTO.LogInResponseDTO;
 import com.asinglah.backend.DTO.UserResponseDTO.ResetPasswordResponseDTO;
 import com.asinglah.backend.DTO.UserResponseDTO.SignUpUserResponseDTO;
 import com.asinglah.backend.DTO.UserResponseDTO.UserIdResponseDTO;
+import com.asinglah.backend.DTO.UserResponseDTO.UsersEmailResponseDTO;
 import com.asinglah.backend.HelperClass.APIResponse;
 import com.asinglah.backend.Service.UserService;
 
@@ -119,6 +122,17 @@ public class UserController {
 
         return ResponseEntity.status(responseDTO.getStatus()).body(responseDTO);
     }
+
+    @GetMapping("/api/users/searchEmail")
+    public ResponseEntity<APIResponse<List<UsersEmailResponseDTO>>> searchUsersEmail(@RequestParam String email) {
+        
+        APIResponse<List<UsersEmailResponseDTO>> responseDTO=userService.searchUsersEmail(email);
+
+        return ResponseEntity.status(responseDTO.getStatus()).body(responseDTO);
+
+    }
+    
+    
     
     
     

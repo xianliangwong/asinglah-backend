@@ -47,7 +47,7 @@ public class ExpenseService {
     private final StatusCodeRepository statusCodeRepository;
     private final ExpenseTranReqRepository expenseTranReqRepository;
 
-    private String newGroupCreationStatus ="SUCCESS";
+    private String newGroupCreationStatus ="PENDING";
     private String transactionRequestStatus ="PENDING";
     private String successTransaction ="SUCCESS";
 
@@ -418,9 +418,9 @@ ExpenseTranReqRepository expenseTranReqRepository
 
         try{
 
-            List<ListExpenseGroupDTO> responseDTO = groupMemberRepository.findMemberGroupDTOs(userId);
+            List<ListExpenseGroupDTO> responseDTO = expenseGroupRepository.findMemberGroupDTOs(userId);
 
-            if(responseDTO==null){
+            if(responseDTO.size()==0||responseDTO==null){
                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"invalid userId");
             }
            

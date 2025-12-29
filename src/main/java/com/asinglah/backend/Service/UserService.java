@@ -1,6 +1,7 @@
 package com.asinglah.backend.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,6 +15,7 @@ import com.asinglah.backend.DTO.UserResponseDTO.LogInResponseDTO;
 import com.asinglah.backend.DTO.UserResponseDTO.ResetPasswordResponseDTO;
 import com.asinglah.backend.DTO.UserResponseDTO.SignUpUserResponseDTO;
 import com.asinglah.backend.DTO.UserResponseDTO.UserIdResponseDTO;
+import com.asinglah.backend.DTO.UserResponseDTO.UsersEmailResponseDTO;
 import com.asinglah.backend.Entity.User;
 import com.asinglah.backend.HelperClass.APIResponse;
 import com.asinglah.backend.HelperClass.JwtUtil;
@@ -227,5 +229,23 @@ public class UserService {
 
     }
 
+
+    @Transactional
+    public APIResponse<List<UsersEmailResponseDTO>> searchUsersEmail(String email){
+
+        try{
+
+            List<User> existingUsers = userRepository.searchUserByEmail(email+"%")
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"users not found"));
+
+            List<UsersEmailResponseDTO> responseDTO = existingUsers.stream().map(user -> new UsersEmailResponseDTO(user.getEmailAddress(),user.getId())) .toList();
+
+
+            return APIResponse.success(responseDTO);
+        }catch(Exception e){
+            return APIResponse.failure(
+                "failed to search users");
+        }
+    }
    
 }
