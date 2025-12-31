@@ -70,10 +70,6 @@ public class ExpenseController {
     }
     
 
-    
-    //to do 
-    //check on how to get expensegroup by expensegroupid, another endpoint by userid and statusid=2
-
     @GetMapping("/api/expense/{expenseId}/splits")
     public ResponseEntity<APIResponse<List<Expense_split>>> getExpenseSplit(@PathVariable Long expenseId) {
         
@@ -82,7 +78,7 @@ public class ExpenseController {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
-    //change to use update action verb 
+    //implementation for update existing expense splits 
     @PutMapping("/api/expense/{expenseId}/splits")
     public String updateExistingSplit(@PathVariable Long expenseId,@Valid @RequestBody InsertNewSplitDTO requestNewSplit) {
         //TODO: process POST request
