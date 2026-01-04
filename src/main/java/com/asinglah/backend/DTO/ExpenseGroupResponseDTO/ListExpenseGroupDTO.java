@@ -1,3 +1,3 @@
-package com.asinglah.backend.DTO.ExpesenResponseDTO;
+package com.asinglah.backend.DTO.ExpenseGroupResponseDTO;
 
 public interface ListExpenseGroupDTO { String getGroupName(); long getExpenseGroupId(); }

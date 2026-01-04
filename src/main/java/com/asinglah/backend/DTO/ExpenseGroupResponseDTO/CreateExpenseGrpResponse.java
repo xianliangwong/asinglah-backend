@@ -1,4 +1,4 @@
-package com.asinglah.backend.DTO.ExpesenResponseDTO;
+package com.asinglah.backend.DTO.ExpenseGroupResponseDTO;
 
 import java.time.LocalDateTime;
 

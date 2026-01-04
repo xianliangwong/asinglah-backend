@@ -10,13 +10,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.asinglah.backend.DTO.ExpenseGroupResponseDTO.CreateExpenseGrpResponse;
+import com.asinglah.backend.DTO.ExpenseGroupResponseDTO.GroupInvResponseDTO;
+import com.asinglah.backend.DTO.ExpenseGroupResponseDTO.ListExpenseGroupDTO;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.CreateExpenseGrp;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.CreateExpenseTransactionDTO;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.InsertNewSplitDTO;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.SplitRequest;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.existingSplitDTO;
-import com.asinglah.backend.DTO.ExpesenResponseDTO.CreateExpenseGrpResponse;
-import com.asinglah.backend.DTO.ExpesenResponseDTO.ListExpenseGroupDTO;
 import com.asinglah.backend.Entity.Expense;
 import com.asinglah.backend.Entity.ExpenseTransaction_request;
 import com.asinglah.backend.Entity.Expense_group;
@@ -411,7 +412,6 @@ ExpenseTranReqRepository expenseTranReqRepository
         }
     }
 
-
     @Transactional
     public APIResponse<List<ListExpenseGroupDTO>> getExpenseGroupByUserId(Long userId)
     {
@@ -421,7 +421,7 @@ ExpenseTranReqRepository expenseTranReqRepository
             List<ListExpenseGroupDTO> responseDTO = expenseGroupRepository.findMemberGroupDTOs(userId);
 
             if(responseDTO.size()==0||responseDTO==null){
-               throw new ResponseStatusException(HttpStatus.NOT_FOUND,"invalid userId");
+               throw new ResponseStatusException(HttpStatus.NOT_FOUND,"no record found");
             }
            
 
@@ -432,8 +432,21 @@ ExpenseTranReqRepository expenseTranReqRepository
            
         }
 
+    }
 
+    @Transactional
+    public APIResponse<List<GroupInvResponseDTO>> getGroupInvitationListByUserId(Long userId){
+        try {
+            List<GroupInvResponseDTO> responseDTO = groupMemberRepository.findGroupMemberInv(userId);
 
+            if(responseDTO.size()==0||responseDTO==null){
+               throw new ResponseStatusException(HttpStatus.NOT_FOUND,"no record found");
+            }
+
+            return APIResponse.success(responseDTO);
+        } catch (Exception e) {
+            return APIResponse.failure("failed to get invitation list");
+        }
     }
 }
 
