@@ -20,7 +20,7 @@ public interface GroupMemberRepository extends JpaRepository<group_member,Long>{
     // List<ListExpenseGroupDTO> findMemberGroupDTOs(@Param("userId") long userId);
 
     @Query(value=
-        "SELECT eg.group_name AS groupName,eg.expense_group_id AS expenseGroupId, u.email_address AS invitor"
+        "SELECT eg.group_name AS groupName,eg.expense_group_id AS expenseGroupId, u.email_address AS invitor,gm.created_at AS invitationDateTime"
         +" FROM group_member gm join expense_group eg on gm.expense_group_id=eg.expense_group_id" 
         +" JOIN users u on eg.group_owner_id=u.user_id"
         +" WHERE gm.user_id=:userId AND gm.statusid=1"
