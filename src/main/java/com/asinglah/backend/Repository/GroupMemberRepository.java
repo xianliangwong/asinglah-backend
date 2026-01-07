@@ -4,6 +4,7 @@ package com.asinglah.backend.Repository;
 
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -26,6 +27,10 @@ public interface GroupMemberRepository extends JpaRepository<group_member,Long>{
         +" WHERE gm.user_id=:userId AND gm.statusid=1"
     , nativeQuery = true)
     List<GroupInvResponseDTO> findGroupMemberInv(@Param("userId") long userId);
+
+    @Query(value="SELECT * FROM group_member where expense_group_id=:groupId and user_id=:userId",
+    nativeQuery =true)
+    Optional<group_member> findGroupMemberIdByGroupIdAndUserId(@Param("groupId") long groupId,@Param("userId") long userId);
 
 
 }

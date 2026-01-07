@@ -10,9 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.asinglah.backend.DTO.ExpenseGroupRequestDTO.UpdateExpenseGroupInvDTO;
 import com.asinglah.backend.DTO.ExpenseGroupResponseDTO.CreateExpenseGrpResponse;
 import com.asinglah.backend.DTO.ExpenseGroupResponseDTO.GroupInvResponseDTO;
 import com.asinglah.backend.DTO.ExpenseGroupResponseDTO.ListExpenseGroupDTO;
+import com.asinglah.backend.DTO.ExpenseGroupResponseDTO.UpdateExpenseGroupInvResDTO;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.CreateExpenseGrp;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.CreateExpenseTransactionDTO;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.InsertNewSplitDTO;
@@ -446,6 +448,38 @@ ExpenseTranReqRepository expenseTranReqRepository
             return APIResponse.success(responseDTO);
         } catch (Exception e) {
             return APIResponse.failure("failed to get invitation list");
+        }
+    }
+
+    @Transactional
+    public APIResponse<UpdateExpenseGroupInvResDTO> updateGroupInvitationStatusID(UpdateExpenseGroupInvDTO requestDTO){
+
+        try{
+            //update implementation
+            group_member groupMemberId = groupMemberRepository.findGroupMemberIdByGroupIdAndUserId(requestDTO.groupId(),requestDTO.userId())
+            .orElseThrow(() -> new ResponseStatusException(
+            HttpStatus.NOT_FOUND, "group member id not found "
+            ));
+
+            UpdateExpenseGroupInvResDTO responseDTO =groupMemberRepository.findById(groupMemberId.getId()).map(updatedRecord->{
+
+                StatusCode statusId=statusCodeRepository.findById(requestDTO.statusId()).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "status code id not found "
+                ));
+                updatedRecord.setStatusID(statusId);
+                groupMemberRepository.save(updatedRecord);
+                
+                return new UpdateExpenseGroupInvResDTO(updatedRecord.getExpense_group().getExpenseGroupId(),"success updated group member's status id");
+
+
+            }).orElseThrow(() -> new ResponseStatusException(
+            HttpStatus.NOT_FOUND, "group member id not found "
+            ));
+
+           return APIResponse.success(responseDTO);
+        }
+        catch(Exception e){
+        return APIResponse.failure("failed to update status");
         }
     }
 }

@@ -8,9 +8,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.asinglah.backend.DTO.ExpenseGroupRequestDTO.UpdateExpenseGroupInvDTO;
 import com.asinglah.backend.DTO.ExpenseGroupResponseDTO.CreateExpenseGrpResponse;
 import com.asinglah.backend.DTO.ExpenseGroupResponseDTO.GroupInvResponseDTO;
 import com.asinglah.backend.DTO.ExpenseGroupResponseDTO.ListExpenseGroupDTO;
+import com.asinglah.backend.DTO.ExpenseGroupResponseDTO.UpdateExpenseGroupInvResDTO;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.CreateExpenseGrp;
 import com.asinglah.backend.HelperClass.APIResponse;
 import com.asinglah.backend.Service.ExpenseService;
@@ -64,10 +66,12 @@ public class ExpenseGroupController {
     
 
     @PutMapping("/api/expenseGroup/invitation")
-    public String updateGroupMember(@RequestBody String entity) {
-        //TODO: process PUT request
+    public ResponseEntity<APIResponse<UpdateExpenseGroupInvResDTO>> updateGroupMember(@Valid @RequestBody UpdateExpenseGroupInvDTO requestDTO) {
         
-        return entity;
+        
+        APIResponse<UpdateExpenseGroupInvResDTO> response=expenseService.updateGroupInvitationStatusID(requestDTO);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
     
     
