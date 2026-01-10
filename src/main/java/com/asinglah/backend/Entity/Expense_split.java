@@ -16,6 +16,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -56,6 +57,10 @@ public class Expense_split {
     // BOOLEAN column
     @Column(name = "is_settled", nullable = false)
     private boolean isSettled;
+
+    @Column(name = "description", length = 2000, nullable = true) 
+    @Size(max = 2000) // Bean validation private String description;
+    private String description;
 
     // TIMESTAMP column
     @Column(name = "created_at", nullable = false)

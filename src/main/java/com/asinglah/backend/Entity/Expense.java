@@ -46,6 +46,10 @@ public class Expense {
     @JoinColumn(name ="user_id", nullable = false, referencedColumnName = "user_id")
     private User user;
 
+    @ManyToOne 
+    @JoinColumn(name ="init_payer_id", nullable = false, referencedColumnName = "user_id")
+    private User initPayer;
+
     // One Expense → Many ExpenseSplits
     @OneToMany(mappedBy = "expenseId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Expense_split> splits = new ArrayList<>();
