@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.asinglah.backend.DTO.ExpenseGroupRequestDTO.UpdateExpenseGroupInvDTO;
 import com.asinglah.backend.DTO.ExpenseGroupResponseDTO.CreateExpenseGrpResponse;
 import com.asinglah.backend.DTO.ExpenseGroupResponseDTO.GroupInvResponseDTO;
+import com.asinglah.backend.DTO.ExpenseGroupResponseDTO.GroupMemberResponseDTO;
 import com.asinglah.backend.DTO.ExpenseGroupResponseDTO.ListExpenseGroupDTO;
 import com.asinglah.backend.DTO.ExpenseGroupResponseDTO.UpdateExpenseGroupInvResDTO;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.CreateExpenseGrp;
@@ -480,6 +481,28 @@ ExpenseTranReqRepository expenseTranReqRepository
         }
         catch(Exception e){
         return APIResponse.failure("failed to update status");
+        }
+    }
+
+    @Transactional
+    public APIResponse<List<GroupMemberResponseDTO>> getGroupMembersbyExpenseGroupId(long expenseGroupId){
+
+        try{
+            List<GroupMemberResponseDTO> responseDTO = expenseGroupRepository.findGroupMembersOnExpenseGroupid(expenseGroupId);
+
+            if(responseDTO.size()==0||responseDTO==null){
+               throw new ResponseStatusException(HttpStatus.NOT_FOUND,"no group members found");
+            }
+            else{
+                //last in the list will always be the owner_user_id of the group expense
+                GroupMemberResponseDTO groupOwner = expenseGroupRepository.findExpenseGroupOwner(expenseGroupId);
+                responseDTO.add(groupOwner);
+
+            }
+            return APIResponse.success(responseDTO);
+        }
+        catch(Exception e){
+            return APIResponse.failure("failed to retrieve group member");
         }
     }
 }

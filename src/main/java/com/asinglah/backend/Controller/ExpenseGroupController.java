@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.asinglah.backend.DTO.ExpenseGroupRequestDTO.UpdateExpenseGroupInvDTO;
 import com.asinglah.backend.DTO.ExpenseGroupResponseDTO.CreateExpenseGrpResponse;
 import com.asinglah.backend.DTO.ExpenseGroupResponseDTO.GroupInvResponseDTO;
+import com.asinglah.backend.DTO.ExpenseGroupResponseDTO.GroupMemberResponseDTO;
 import com.asinglah.backend.DTO.ExpenseGroupResponseDTO.ListExpenseGroupDTO;
 import com.asinglah.backend.DTO.ExpenseGroupResponseDTO.UpdateExpenseGroupInvResDTO;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.CreateExpenseGrp;
@@ -74,6 +75,13 @@ public class ExpenseGroupController {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
     
+    @GetMapping("/api/expenseGroup/groupMembers")
+    public ResponseEntity<APIResponse<List<GroupMemberResponseDTO>>> getGroupMember(@RequestParam long expenseGroupId){
+
+        APIResponse<List<GroupMemberResponseDTO>> response=expenseService.getGroupMembersbyExpenseGroupId(expenseGroupId);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
     
 
 
