@@ -43,16 +43,20 @@ public class ExpenseController {
 
     //ResponseEntity<Expense>
     @PostMapping("/api/expense/v1/expenses")
-    public ResponseEntity<APIResponse<Expense>> createExpense(@Valid @RequestBody CreateExpenseRequest request) {
-        APIResponse<Expense> response= expenseService.createExpense(
+    public ResponseEntity<APIResponse<String>> createExpense(@Valid @RequestBody CreateExpenseRequest request) {
+        APIResponse<String> response= expenseService.createExpense(
                 request.getCreatorId(),
+                request.getPayerId(),
                 request.getGroupId(),
                 request.getDescription(),
                 request.getTotalAmount(),
+                request.getTransactionDate(),
                 request.getSplits()
         );
 
         return ResponseEntity.status(response.getStatus()).body(response);
+
+        //change to return string instead of expense entity class
 
         //can change to use a response dto for data in global response 
         //return APIResponse.success(expense);//using global response handler with status code, message and data

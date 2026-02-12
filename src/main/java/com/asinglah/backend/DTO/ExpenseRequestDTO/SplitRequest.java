@@ -9,6 +9,7 @@ import lombok.Getter;
 public class SplitRequest {
     private Long userId;
     private BigDecimal amount;
+    private String splitDescription;
     // getters and setters
 }
 

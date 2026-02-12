@@ -1,8 +1,10 @@
 package com.asinglah.backend.Entity;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -71,6 +73,9 @@ public class Expense {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
     // TIMESTAMP in SQL Server maps to LocalDateTime in Java
+
+    @Column(name="transaction_date",nullable=false)
+    private LocalDate transactionDate;
 
     @PrePersist
     protected void onCreate() {

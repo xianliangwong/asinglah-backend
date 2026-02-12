@@ -2,8 +2,12 @@ package com.asinglah.backend.Service;
 
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -36,6 +40,7 @@ import com.asinglah.backend.Repository.ExpenseTranReqRepository;
 import com.asinglah.backend.Repository.GroupMemberRepository;
 import com.asinglah.backend.Repository.StatusCodeRepository;
 import com.asinglah.backend.Repository.UserRepository;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 
 import jakarta.transaction.Transactional;
 
@@ -70,11 +75,17 @@ ExpenseTranReqRepository expenseTranReqRepository
     }
 
     @Transactional //this key word faciliates roll back 
-    public APIResponse<Expense> createExpense(Long creatorID,Long groupId,String description, BigDecimal totalAmount, List<SplitRequest> splits) {
+    public APIResponse<String> createExpense(Long creatorID,Long payerId,Long groupId,String description, BigDecimal totalAmount,LocalDate transactionDate, List<SplitRequest> splits) {
+        
+        User initPayerId = userRepository.findById(payerId).orElseThrow(() -> new RuntimeException("user not found"));
+        
         Expense expense = new Expense();
         expense.setDescription(description);
         expense.setTotalAmount(totalAmount);
         expense.setCurrencyCode("MYR");
+        expense.setTransactionDate(transactionDate);
+        expense.setInitPayer(initPayerId);
+        
 
         Expense_group expenseGroup = expenseGroupRepository.findById(groupId)
                     .orElseThrow(() -> new RuntimeException("Group ID not found"));
@@ -90,6 +101,9 @@ ExpenseTranReqRepository expenseTranReqRepository
             User user = userRepository.findById(splitReq.getUserId())
                     .orElseThrow(() -> new RuntimeException("User not found"));
             Expense_split split = new Expense_split();
+            if(splitReq.getSplitDescription() !=null && splitReq.getSplitDescription().isEmpty()==false){
+                split.setDescription(splitReq.getSplitDescription());
+            }
             split.setTotalAmountOwed(splitReq.getAmount());
             split.setSettled(false);
             split.setPartipcantUser(user);
@@ -98,9 +112,11 @@ ExpenseTranReqRepository expenseTranReqRepository
         }
 
         try{
+
+            //change to return successful string to indicate success save
             Expense resultExpense= expenseRepository.save(expense); // cascades and saves splits too
 
-            return APIResponse.successCreate(resultExpense);
+            return APIResponse.successCreate("Expense split - "+resultExpense.getDescription()+" created");
         }
         catch(Exception e){
              return APIResponse.failure("Failed to create new expense item: " + e.getMessage());
