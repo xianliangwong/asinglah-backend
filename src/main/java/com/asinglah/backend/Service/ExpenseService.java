@@ -104,10 +104,18 @@ ExpenseTranReqRepository expenseTranReqRepository
             if(splitReq.getSplitDescription() !=null && splitReq.getSplitDescription().isEmpty()==false){
                 split.setDescription(splitReq.getSplitDescription());
             }
+            if(initPayerId.getId()==user.getId()){
+                split.setSettled(true);
+                split.setRemainingAmountOwed(new BigDecimal(0.00));
+            }
+            else{
+                split.setSettled(false);
+                 split.setRemainingAmountOwed(splitReq.getAmount());
+            }
             split.setTotalAmountOwed(splitReq.getAmount());
-            split.setSettled(false);
+           
             split.setPartipcantUser(user);
-            split.setRemainingAmountOwed(splitReq.getAmount());
+           
             expense.addSplit(split); // sets both sides of the relationship
         }
 
