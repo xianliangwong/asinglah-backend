@@ -22,7 +22,7 @@ public interface ExpenseGroupRepository extends JpaRepository<Expense_group,Long
 
     @Query(value="select gm.user_id as userId,u.email_address as email from expense_group eg join group_member gm on eg.expense_group_id=gm.expense_group_id\r\n" + //
                 "join users u on gm.user_id=u.user_id\r\n" + //
-                "where eg.expense_group_id=:expenseGroupId", nativeQuery = true)
+                "where eg.expense_group_id=:expenseGroupId and gm.statusid=2", nativeQuery = true)
     List<GroupMemberResponseDTO> findGroupMembersOnExpenseGroupid(@Param("expenseGroupId") long expenseGroupId);
 
     @Query(value="select eg.group_owner_id as userId,u.email_address as email  from expense_group eg join users u on eg.group_owner_id = u.user_id where eg.expense_group_id=:expenseGroupId",nativeQuery = true)
