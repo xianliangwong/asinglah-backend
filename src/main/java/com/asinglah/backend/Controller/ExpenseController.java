@@ -4,12 +4,14 @@ package com.asinglah.backend.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
 import com.asinglah.backend.DTO.ExpenseRequestDTO.CreateExpenseRequest;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.CreateExpenseTransactionDTO;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.InsertNewSplitDTO;
+import com.asinglah.backend.DTO.ExpenseResponseDTO.ExpenseOweResDTO;
 import com.asinglah.backend.Entity.Expense;
 import com.asinglah.backend.Entity.ExpenseTransaction_request;
 import com.asinglah.backend.Entity.Expense_split;
@@ -68,6 +70,14 @@ public class ExpenseController {
        
 
         APIResponse<List<Expense>> response = expenseService.getAllExpense(expenseGroupId);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @GetMapping("/api/expense/v1/getUserOweExpense")
+    public ResponseEntity<APIResponse<List<ExpenseOweResDTO>>> getUserOweExpense(@RequestParam("userId") Long userId, @RequestParam("groupId") Long groupId){
+
+        APIResponse<List<ExpenseOweResDTO>> response = expenseService.getUserOweExpense(userId,groupId);
 
         return ResponseEntity.status(response.getStatus()).body(response);
     }

@@ -7,8 +7,12 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.Collections;
+
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -25,6 +29,7 @@ import com.asinglah.backend.DTO.ExpenseRequestDTO.CreateExpenseTransactionDTO;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.InsertNewSplitDTO;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.SplitRequest;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.existingSplitDTO;
+import com.asinglah.backend.DTO.ExpenseResponseDTO.ExpenseOweResDTO;
 import com.asinglah.backend.Entity.Expense;
 import com.asinglah.backend.Entity.ExpenseTransaction_request;
 import com.asinglah.backend.Entity.Expense_group;
@@ -41,7 +46,6 @@ import com.asinglah.backend.Repository.GroupMemberRepository;
 import com.asinglah.backend.Repository.StatusCodeRepository;
 import com.asinglah.backend.Repository.UserRepository;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
-
 import jakarta.transaction.Transactional;
 
 
@@ -527,6 +531,27 @@ ExpenseTranReqRepository expenseTranReqRepository
         }
         catch(Exception e){
             return APIResponse.failure("failed to retrieve group member");
+        }
+    }
+
+    @Transactional
+    public APIResponse<List<ExpenseOweResDTO>> getUserOweExpense(Long userId,Long groupId){
+        try{
+
+            User personOweExpense = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("user not found"));
+
+            Expense_group expenseGroup = expenseGroupRepository.findById(groupId).orElseThrow(() -> new RuntimeException("invalid expense group id"));
+
+            Optional <List<ExpenseOweResDTO>> result = expenseRepository.getOweExpense(userId,groupId);
+
+            List<ExpenseOweResDTO> response = result.orElse(Collections.emptyList());
+
+            return APIResponse.success(response);
+
+
+        }
+        catch(Exception e){
+            return APIResponse.failure("failed to retrieve owe expense");
         }
     }
 }
