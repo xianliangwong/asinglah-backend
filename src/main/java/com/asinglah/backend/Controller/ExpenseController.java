@@ -12,6 +12,7 @@ import com.asinglah.backend.DTO.ExpenseRequestDTO.CreateExpenseRequest;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.CreateExpenseTransactionDTO;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.InsertNewSplitDTO;
 import com.asinglah.backend.DTO.ExpenseResponseDTO.ExpenseOweResDTO;
+import com.asinglah.backend.DTO.ExpenseResponseDTO.OweExpensesDetailResDTO;
 import com.asinglah.backend.Entity.Expense;
 import com.asinglah.backend.Entity.ExpenseTransaction_request;
 import com.asinglah.backend.Entity.Expense_split;
@@ -74,6 +75,15 @@ public class ExpenseController {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
+    @GetMapping("/api/expense/v1/{expenseGroupId}/expenses/OweExpensesDetail")
+    public ResponseEntity<APIResponse<List<OweExpensesDetailResDTO>>> getUserOweExpenseDetails(@PathVariable Long expenseGroupId, @RequestParam("userId") Long userId,@RequestParam("initPayerName") String payerName)
+    {
+        APIResponse<List<OweExpensesDetailResDTO>> response = expenseService.getUserOweExpenseDetails(expenseGroupId,userId,payerName);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+
+    }
+
     @GetMapping("/api/expense/v1/getUserOweExpense")
     public ResponseEntity<APIResponse<List<ExpenseOweResDTO>>> getUserOweExpense(@RequestParam("userId") Long userId, @RequestParam("groupId") Long groupId){
 
@@ -81,6 +91,8 @@ public class ExpenseController {
 
         return ResponseEntity.status(response.getStatus()).body(response);
     }
+
+    
     
 
     @GetMapping("/api/expense/{expenseId}/splits")

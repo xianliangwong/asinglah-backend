@@ -30,6 +30,7 @@ import com.asinglah.backend.DTO.ExpenseRequestDTO.InsertNewSplitDTO;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.SplitRequest;
 import com.asinglah.backend.DTO.ExpenseRequestDTO.existingSplitDTO;
 import com.asinglah.backend.DTO.ExpenseResponseDTO.ExpenseOweResDTO;
+import com.asinglah.backend.DTO.ExpenseResponseDTO.OweExpensesDetailResDTO;
 import com.asinglah.backend.Entity.Expense;
 import com.asinglah.backend.Entity.ExpenseTransaction_request;
 import com.asinglah.backend.Entity.Expense_group;
@@ -553,6 +554,34 @@ ExpenseTranReqRepository expenseTranReqRepository
         catch(Exception e){
             return APIResponse.failure("failed to retrieve owe expense");
         }
+    }
+
+    @Transactional
+    public APIResponse<List<OweExpensesDetailResDTO>> getUserOweExpenseDetails(Long expenseGroupId,Long userId,String payerName){
+
+        try{
+            User initPayerId = userRepository.findByEmailNative(payerName);
+
+            if(initPayerId!=null){
+
+                Optional <List<OweExpensesDetailResDTO>> result = expenseRepository.getOweExpenseByInitPayerId(initPayerId.getId(),userId,expenseGroupId);
+
+                List<OweExpensesDetailResDTO> response = result.orElse(Collections.emptyList());
+
+                return APIResponse.success(response);
+
+            }
+            else{
+                throw new RuntimeException("Invalid init payer name ");
+                
+            }
+            
+        }
+        catch(Exception e){
+            return APIResponse.failure("failed to retrieve owe expense details");
+
+        }
+        
     }
 }
 
